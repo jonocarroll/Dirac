@@ -1,28 +1,22 @@
 #
-#  Makefile to create IntTest
+#  Makefile to create Dirac
 #
-COMPILER = gfortran #ifort
+COMPILER = gfortran
 CFLAGS   = -mcmodel=medium -ffree-line-length-512 -fdec #-double-size 64 -integer-size 64 -shared-intel
 #CFLAGS   =  -check all
 #CFLAGS   =  -no-ipo -r8 -i8
-#CFLAGS    =  -mcmodel=medium -r8 -i8 -double-size 64 -integer-size 64 -traceback 
-LIBS     = 
+#CFLAGS   =  -mcmodel=medium -r8 -i8 -double-size 64 -integer-size 64 -traceback
+LIBS     =
 
 #  Objects to create
 #
-OBJECTS = nrtype.o \
+OBJECTS = \
+    nrtype.o \
 	  shared.o \
 	  funcs.o \
-          FindEigenvalue.o
+    FindEigenvalue.o
 
-#	  DCUHREm.o \
-#	  quadpack.o \
-#	  quadpack2.o \
-
-#	  nrutil.o \
-#	  myIntegrate.o \
-
-#  Pattern rule(s)  
+#  Pattern rule(s)
 #
 %.o : %.f90
 	$(COMPILER) $(CFLAGS) -c $<
@@ -32,20 +26,7 @@ OBJECTS = nrtype.o \
 Dirac: $(OBJECTS)
 	$(COMPILER) $(CFLAGS) -o $@ $(OBJECTS) $(LIBS)
 
-#  Dependencies
+# Clean up
 #
-#myKinds.o: 
-
-#newtonRaph.o:
-
-#rungeKutta.o: myKinds.o
-
-#odeInt.o: rungeKutta.o
-
-#SolveSE.o: odeInt.o newtonRaph.o 
-
-
-# Clean up rule
-#
-clean: 
+clean:
 	rm -f *.o *.mod *~ Dirac
