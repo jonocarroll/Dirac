@@ -26,7 +26,7 @@ contains
 
 !!$  function Coulomb_2(rad)
 !!$
-!!$    use shared  
+!!$    use shared
 !!$    use myIntegrate
 !!$
 !!$    implicit none
@@ -40,7 +40,7 @@ contains
 
   function c_func1(rad)
 
-    use shared  
+    use shared
 
     implicit none
 
@@ -53,7 +53,7 @@ contains
 
   function c_func2(rad)
 
-    use shared  
+    use shared
 
     implicit none
 
@@ -66,7 +66,7 @@ contains
 
   function rho(rad)
 
-    use shared  
+    use shared
 !    use myIntegrate
 
     implicit none

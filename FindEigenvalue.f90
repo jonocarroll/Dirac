@@ -33,8 +33,6 @@ program FindEigenvalue
 
   allocate(F_state(n_steps,num_states))
   allocate(G_state(n_steps,num_states))
-!!$  allocate(F_state(n_steps,num_states))
-!!$  allocate(G_state(n_steps,num_states))
 
   proportional_factor = h_step
 
@@ -68,7 +66,7 @@ program FindEigenvalue
   if ( solving_method == 2 ) print *,"USING ADAMS BASHFORTH TO FIND EIGENVALUE"
 
   do state = 1, 1!num_states
- 
+
      do attempt = 1, max_attempts
 
         write(*,'(a,F18.12,a)')"eigenvalue = ",eigenvalue(state)*fermi*1000," keV"
@@ -143,31 +141,6 @@ program FindEigenvalue
 !!$           write(*,*)" CHECKING BETTER: SUM = ",sum_integral
 !!$           !! !!!!!!!!!!!!!!!!
 
-
-!!$           open(41,file='muH_F.dat',status='unknown')
-!!$           do r_it = 1, n_steps
-!!$              write(41,*)r_it*h_step,F_state(r_it,state),G_state(r_it,state)
-!!$           end do
-!!$           close(41)
-!!$
-
-        !           if ( proportional_factor > yErrReq ) then
-
-!        go to 85
-
-
-!85      continue
-
-        !           else
-        !              print *,"errors within tolerance"
-        !              print *,"Fdiff = ",Fdiff
-        !              go to 51
-        !           end if
-
-        !           write(*,*)"central = ",Fdiff
-        !           write(*,*)"up      = ",Fdiff_up
-        !           write(*,*)"down    = ",Fdiff_down
-
 !!$           Fderiv = (Fdiff_up-Fdiff_down)/proportional_factor
 !!$           print *,"Fderiv = ",Fderiv
 
@@ -210,37 +183,6 @@ program FindEigenvalue
            write(61,*)r_it*h_step,F_state(r_it,state),G_state(r_it,state)
         end do
         close(61)
-
-
-!!$           write(*,'(a,e12.6)')"prop. factor is now ",proportional_factor
-!!$           if ( log10(proportional_factor) < -20 ) then
-!!$              print *,"CAN'T VARY THE EV ANY MORE... CLOSING"
-!!$              go to 51
-!!$           end if
-
-!!$           STOP
-!!$           if ( abs(deltaEV) > yErrReq ) then
-!!$              print *,"F(match) = ",F_state(match,state)
-!!$              print *,"F(match+1) = ",F_state(match+1,state)
-!!$              print *,"G(match) = ",G_state(match,state)
-!!$              print *,"G(match+1) = ",G_state(match+1,state)
-!!$              print *,"Fdiff = ",Fdiff
-!!$              print *,"deltaEV = ",deltaEV," vs m = ",m_reduced
-!!$              !
-!!$              eigenvalue(state) = eigenvalue(state) + deltaEV
-!!$              !
-!!$           else
-!!$              !
-!!$              print *,"F(match) = ",F_state(match,state)
-!!$              print *,"F(match+1) = ",F_state(match+1,state)
-!!$              print *,"G(match) = ",G_state(match,state)
-!!$              print *,"G(match+1) = ",G_state(match+1,state)
-!!$              print *,"Fdiff = ",Fdiff
-!!$              print *,"deltaEV = ",deltaEV," vs m = ",m_reduced
-!!$              pause
-!!$              go to 51
-!!$              !
-!!$           end if
         !
         if ( attempt == max_attempts ) STOP ' too many attempts '
         !
@@ -266,7 +208,7 @@ program FindEigenvalue
            call FGIntegral(test_eigenvalue)
         end if
 
-        ! scale the solutions to make the 
+        ! scale the solutions to make the
         ! match point smooth
         scalefactor = G_state(match+1,state)/G_state(match,state)
         G_state(:match,state) = G_state(:match,state)*scalefactor
@@ -295,9 +237,6 @@ program FindEigenvalue
         G_state(:,state) = G_state(:,state)/sqrt(abs(sum_integral))
         ! calculate discontinuity
         Fdiff = (F_state(match+1,state) - F_state(match,state))/F_state(match,state)
-!!$              print *,"fdiff_up = ",Fdiff_up
-
-
 
         F_state(:,state) = 0.0_dp
         G_state(:,state) = 0.0_dp
@@ -339,7 +278,6 @@ program FindEigenvalue
         G_state(:,state) = G_state(:,state)/sqrt(abs(sum_integral))
         ! calculate discontinuity
         Fdiff_up = (F_state(match+1,state) - F_state(match,state))/F_state(match,state)
-!!$              print *,"fdiff_up = ",Fdiff_up
 
         F_state(:,state) = 0.0_dp
         G_state(:,state) = 0.0_dp
@@ -381,19 +319,12 @@ program FindEigenvalue
         G_state(:,state) = G_state(:,state)/sqrt(abs(sum_integral))
         ! calculate discontinuity
         Fdiff_down = (F_state(match+1,state) - F_state(match,state))/F_state(match,state)
-!!$              print *,"fdiff_down = ",Fdiff_down 
 
         write(*,*)"central = ",Fdiff
         write(*,*)"up      = ",Fdiff_up
         write(*,*)"down    = ",Fdiff_down
 
-!!$           Fderiv = (Fdiff_up-Fdiff_down)/proportional_factor
-!!$           print *,"Fderiv = ",Fderiv
-
         if ( ( abs(Fdiff_down) < abs(Fdiff) ) .and. ( abs(Fdiff_up) < abs(Fdiff) ) ) then
-!!$              EVshift = Fdiff/Fderiv
-!!$              print *,"EVshift = ",EVshift," = ",100.0_dp*EVshift/eigenvalue(state),"%"
-!!$              eigenvalue(state) = eigenvalue(state) - EVshift
            !
            if ( abs(Fdiff_up) .le. abs(Fdiff_down) ) then
               eigenvalue(state) = (1.0_dp+proportional_factor)*eigenvalue(state)
@@ -414,16 +345,8 @@ program FindEigenvalue
            end if
         end if
 
-!!$        open(61,file='Wavefunctions.dat',status='unknown')
-!!$        do r_it = 1, n_steps,1000
-!!$           write(61,*)r_it*h_step,F_state(r_it,state),G_state(r_it,state)
-!!$        end do
-!!$        close(61)
-
         if ( abs(proportional_factor) < yErrReq ) then
            print *,"proportional factor is small enough now... done"
-!!$                 print *,"EV shift is small enough now... done."
-!!$                 write(*,'(a,e12.6,a,e12.6)')"EVshift = ",abs(Evshift)," vs yErrReq = ",yErrReq
            go to 51
         end if
 
@@ -432,19 +355,13 @@ program FindEigenvalue
      end do ! guess
 
 51   continue
-     !           
+     !
      write(*,*)"THE EVALUE OF STATE ",state," IS ",eigenvalue(state)*fermi*1000," keV"
      write(*,*)"THE EXACT SOL OF STATE  ",state," IS ",exact_solution(state)*fermi*1000," keV"
      !
      ! write(*,*)"THE EVALUE OF STATE ",state," IS ",eigenvalue(state)," fm^(-1)"
      ! write(*,*)"THE EXACT SOL OF STATE  ",state," IS ",exact_solution(state)," fm^(-1)"
      !
-!!$        open(61,file='muH_F.dat',status='unknown')
-!!$        do r_it = 1, n_steps,1000
-!!$           write(61,*)r_it*h_step,F_state(r_it,state),G_state(r_it,state)
-!!$        end do
-!!$        close(61)
-
      go to 52
 
      !! COUNT NODES:
@@ -466,10 +383,6 @@ program FindEigenvalue
      !!
      if ( ( nodes(state) == expected_nodes(state) ) ) then
         accept_ev = 1
-!!$              write(*,*)" IS THIS EIGENVALUE ACCEPTABLE? 1 = yes, 0 = no"
-!!$              write(*,*)
-!!$              read *,accept_ev
-!!$              write(*,*)
      else
         accept_ev = 0
      end if
@@ -504,9 +417,9 @@ end program FindEigenvalue
 
 subroutine myDerivs(r, params, dydr)
 
-  use shared  
+  use shared
   use funcs
-  
+
   implicit none
 
   real(dp), intent(in)  :: r, params(3)
@@ -529,7 +442,7 @@ end subroutine myDerivs
 
 subroutine FGIntegral(input_val)
 
-  use shared  
+  use shared
   use funcs
 
   implicit none
@@ -608,9 +521,6 @@ subroutine FGIntegral(input_val)
      !
   end do
 
-!!$  print *," F = ",F_state(:3,state)
-!!$  print *," G = ",G_state(:3,state)
-
   n0_derivs = temp_derivs(1)
   n1_derivs = temp_derivs(2)
   n2_derivs = temp_derivs(3)
@@ -627,10 +537,10 @@ subroutine FGIntegral(input_val)
 
   do rad_it = 5, match 
 
-     call myDerivs(current_radius+4.0_dp*h_step,current_vals,n4_derivs)     
+     call myDerivs(current_radius+4.0_dp*h_step,current_vals,n4_derivs)
 !!$     current_vals = current_vals + h_step*((55.0_dp/24.0_dp)*n3_derivs - (59.0_dp/24.0_dp)*n2_derivs &
 !!$          & + (37.0_dp/24.0_dp)*n1_derivs - (3.0_dp/8.0_dp)*n0_derivs)   ! 4sAB
-     
+
      deriv_term(1,:) = n0_derivs(:)
      deriv_term(2,:) = n1_derivs(:)
      deriv_term(3,:) = n2_derivs(:)
@@ -649,33 +559,12 @@ subroutine FGIntegral(input_val)
      F_state(rad_it,state) = current_vals(1)
      G_state(rad_it,state) = current_vals(2)
 
-!!$  print *,"F",rad_it," = ",F_state(rad_it,state)
-!!$  print *,"G",rad_it," = ",G_state(rad_it,state)
-!!$  pause
-
-!!$
-!!$     print *,"state = ",state
-!!$     print *,"radius = ",rad_it*h_step
-!!$     print *,"F = ",F_state(rad_it,state)
-!!$     print *,"G = ",G_state(rad_it,state)
-!!$     pause
-
      current_radius = current_radius + h_step
 
   end do
 
-!!$        open(61,file='muH_F.dat',status='unknown')
-!!$        do rad_it = 1, n_steps
-!!$           write(61,'(5F22.12)')rad_it*h_step,F_state(rad_it,state),G_state(rad_it,state),exact_F(rad_it*h_step),exact_G(rad_it*h_step)
-!!$        end do
-!!$        close(61)
-!!$        STOP 'in FGintegral'
-
   Gup = G_state(match,state)
   Fup = F_state(match,state)
-
-!!$  print *,"Fup = ",Fup
-!!$  print *,"Gup = ",Gup
 
 !!$  gamma_func = 1.9999_dp
 !!$  gamma = sqrt(1.0_dp-(alpha**2))
@@ -701,9 +590,6 @@ subroutine FGIntegral(input_val)
      F_state(n_steps-rad_it+1,state) = exact_F(current_radius)
      G_state(n_steps-rad_it+1,state) = exact_G(current_radius)
 
-!!$     print *,"F = ",F_state(n_steps-rad_it+1,state) 
-!!$     print *,"G = ",G_state(n_steps-rad_it+1,state) 
-     !
      current_vals(1) = F_state(n_steps-rad_it+1,state)
      current_vals(2) = G_state(n_steps-rad_it+1,state)
      current_vals(3) = input_val
@@ -711,10 +597,6 @@ subroutine FGIntegral(input_val)
      call myDerivs(current_radius,current_vals,temp_derivs(rad_it))     ! EULER
      !
   end do
-
-!!$  print *,"end:"
-!!$  print *," F = ",F_state(n_steps-3+1:,state)
-!!$  print *," G = ",G_state(n_steps-3+1:,state)
 
   n0_derivs = temp_derivs(1)
   n1_derivs = temp_derivs(2)
@@ -725,7 +607,7 @@ subroutine FGIntegral(input_val)
 
   do rad_it = n_steps-4, match+1, -1
 
-     call myDerivs(current_radius-4.0_dp*h_step,current_vals,n4_derivs)     
+     call myDerivs(current_radius-4.0_dp*h_step,current_vals,n4_derivs)
 !!$     current_vals = current_vals + h_step*((55.0_dp/24.0_dp)*n3_derivs - (59.0_dp/24.0_dp)*n2_derivs &
 !!$          & + (37.0_dp/24.0_dp)*n1_derivs - (3.0_dp/8.0_dp)*n0_derivs)   ! 4sAB
 
@@ -747,25 +629,12 @@ subroutine FGIntegral(input_val)
      F_state(rad_it,state) = current_vals(1)
      G_state(rad_it,state) = current_vals(2)
 
-!!$  print *,"F",rad_it," = ",F_state(rad_it,state)
-!!$  print *,"G",rad_it," = ",G_state(rad_it,state)
-!!$  pause
-
-!!$     print *,"state = ",state
-!!$     print *,"radius = ",rad_it*h_step
-!!$     print *,"F = ",F_state(rad_it,state)
-!!$     print *,"G = ",G_state(rad_it,state)
-!!$     pause
-
      current_radius = current_radius - h_step
 
   end do
 
   Gdown = G_state(match+1,state)
   Fdown = F_state(match+1,state)
-
-!!$  print *,"Fdown = ",Fdown  
-!!$  print *,"Gdown = ",Gdown
 
   RETURN
 
@@ -791,14 +660,10 @@ subroutine Runge_up(eigen)
 
   integer :: ki
 
-!!$  tempF(1) = 0.00001_dp
-!!$  tempG(1) = 0.00001_dp
   tempL(1) = eigen
 
 !!$  V0 = Coulomb(2.0_dp*h_step)
 !!$  V0 = (-3.0_dp/2.0_dp)*alpha/test_radius
-
-!!$  print *,"V0 = ",V0
 
   do ki = 1, 5
      !
@@ -806,7 +671,7 @@ subroutine Runge_up(eigen)
      V0 = Coulomb(temp_rad)
      !
 !     F_state(ki,state) = (V0-eigen)*(temp_rad**2)/3.0_dp
-     
+
      if ( state == 1 ) F_state(ki,state) = exact_F(temp_rad)
      if ( state == 2 ) F_state(ki,state) = exact_F(temp_rad)
 
@@ -825,38 +690,15 @@ subroutine Runge_up(eigen)
      tempL(ki) = eigen
      !
 
-!!$  print *,"r  = ",temp_rad
-!!$  print *,"F1 = ",F_state(ki,state)
-!!$  print *,"V0 = ",V0
-!!$  print *,"e  = ",eigen
-!!$  print *,"------------------"
-
   end do
-
-!!$  print *,"r  = ",temp_rad
-!!$  print *,"F1 = ",F_state(1,state)
-!!$  print *,"V0 = ",V0
-!!$  print *,"e  = ",eigen
-
-!!$  write(*,'(1F13.8)')tempF(:5)
-!!$  print *,"G1:5 = "
-!!$  write(*,'(1F13.8)')tempG(:5)
-!!$  pause
 
   do ki = 5, match-1
 
      temp_params = (/ tempF(ki), tempG(ki), tempL(ki) /)
-!!$     temp_params(1) = tempF(ki)
-!!$     temp_params(2) = tempG(ki)
-!!$     temp_params(3) = tempL(ki)
 
      call myDerivs(temp_rad,temp_params,tempdydr)
 
      KF1 = tempdydr
-
-!!$     go to 73
-
-!!$     print *,"kf1 = ",kf1
 
      newrad = temp_rad + h_step/2.0_dp
      newF = tempF(ki) + h_step*KF1(1)/2.0_dp
@@ -865,12 +707,9 @@ subroutine Runge_up(eigen)
 
      temp_params = (/ newF, newG, newL /)
 
-!!$     print *,"temp 1 = ",temp_params
-
      call myDerivs(newrad,temp_params,tempdydr)
 
      KF2 = tempdydr
-
 
      newrad = temp_rad + h_step/2.0_dp
      newF = tempF(ki) + h_step*KF2(1)/2.0_dp
@@ -878,8 +717,6 @@ subroutine Runge_up(eigen)
      newL = tempL(ki) + h_step*KF2(3)/2.0_dp
 
      temp_params = (/ newF, newG, newL /)
-
-!!$     print *,"temp 2 = ",temp_params
 
      call myDerivs(newrad,temp_params,tempdydr)
 
@@ -892,13 +729,9 @@ subroutine Runge_up(eigen)
 
      temp_params = (/ newF, newG, newL /)
 
-!!$     print *,"temp = 3 ",temp_params
-
      call myDerivs(newrad,temp_params,tempdydr)
 
      KF4 = tempdydr
-
-!!$73   continue
 
      tempF(ki+1) = tempF(ki) + h_step*(KF1(1)+2.0_dp*KF2(1)+2.0_dp*KF3(1)+KF4(1))/6.0_dp
      tempG(ki+1) = tempG(ki) + h_step*(KF1(2)+2.0_dp*KF2(2)+2.0_dp*KF3(2)+KF4(2))/6.0_dp
@@ -909,23 +742,7 @@ subroutine Runge_up(eigen)
 
      temp_rad = temp_rad + h_step
 
-!!$     print *,"r = ",(ki+1)*h_step
-!!$     print *,"F = ",F_state(ki+1,state)
-!!$     print *,"G = ",G_state(ki+1,state)
-!!$     pause
-
   end do
-
-!!$        open(61,file='muH_F.dat',status='unknown')
-!!$        do ki = 1, n_steps
-!!$           write(61,'(5F22.12)')ki*h_step,F_state(ki,state),G_state(ki,state),exact_F(ki*h_step),exact_G(ki*h_step)
-!!$        end do
-!!$        close(61)
-!!$        STOP
-!!$
-!!$
-!!$
-!!$  print *,"fmatch = ",F_state(match,state)
 
 end subroutine Runge_up
 
@@ -949,10 +766,7 @@ subroutine Runge_down(eigen)
 
   integer :: ki
 
-!!$  tempF(n_steps) = 1.0_dp
-!!$  tempG(n_steps) = 0.1_dp
   tempL(n_steps) = eigen
-!!$  temp_rad = h_step*n_steps
 
 !!$  V0 = (-3.0_dp/2.0_dp)*alpha/test_radius
 !!$  gamma_func = 1.9999_dp
@@ -1008,8 +822,6 @@ subroutine Runge_down(eigen)
 
      KF2 = tempdydr
 
-!!$     go to 74
-
      newrad = temp_rad - h_step/2.0_dp
      newF = tempF(ki) - h_step*KF2(1)/2.0_dp
      newG = tempG(ki) - h_step*KF2(2)/2.0_dp
@@ -1032,8 +844,6 @@ subroutine Runge_down(eigen)
 
      KF4 = tempdydr
 
-!!$74 continue
-
      tempF(ki-1) = tempF(ki) - h_step*(KF1(1)+2.0_dp*KF2(1)+2.0_dp*KF3(1)+KF4(1))/6.0_dp
      tempG(ki-1) = tempG(ki) - h_step*(KF1(2)+2.0_dp*KF2(2)+2.0_dp*KF3(2)+KF4(2))/6.0_dp
      tempL(ki-1) = tempL(ki) - h_step*(KF1(3)+2.0_dp*KF2(3)+2.0_dp*KF3(3)+KF4(3))/6.0_dp
@@ -1044,13 +854,5 @@ subroutine Runge_down(eigen)
      temp_rad = temp_rad - h_step
 
   end do
-
-!!$  open(61,file='muH_F.dat',status='unknown')
-!!$  do ki = 1, n_steps, 1000
-!!$     write(61,'(5F22.12)')ki*h_step,F_state(ki,state),G_state(ki,state)
-!!$  end do
-!!$  close(61)
-!!$  STOP
-!!$
 
 end subroutine Runge_down
