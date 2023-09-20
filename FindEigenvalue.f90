@@ -33,13 +33,10 @@ program FindEigenvalue
 
   allocate(F_state(n_steps,num_states))
   allocate(G_state(n_steps,num_states))
-!!$  allocate((n_steps,num_states))
 !!$  allocate(F_state(n_steps,num_states))
+!!$  allocate(G_state(n_steps,num_states))
 
-!!$  print *,"range = ",range(1_I8B),range(1.0_dp)
-!!$  print *,"prec = ",range(1_I8B),precision(1.0_dp)
-
-  proportional_factor = h_step!0.001_dp
+  proportional_factor = h_step
 
   !! Coulomb potential:
 
@@ -49,14 +46,11 @@ program FindEigenvalue
 !!$  end do
 !!$  close(21)
 
-  print *,"m_mu = ",m_muon*fermi," MeV"
-
   !! Solver: !!
   !! Iteratively solve Dirac equation to find E_e = E - m
 
   box_size = h_step*n_steps
-  print *,"box = ",box_size
-  !
+
   exact_solution(1) = m_reduced*(sqrt(1.0_dp-(alpha**2))) - m_reduced  ! E - m
   exact_solution(2) = m_reduced*(sqrt((1.0_dp+sqrt(1.0_dp-(alpha**2)))/2.0_dp)) - m_reduced  ! E - m
 !  exact_solution(3) = m_reduced*(sqrt((1.0_dp+sqrt(1.0_dp-(alpha**2)))/2.0_dp)) - m_reduced  ! E - m
@@ -65,20 +59,18 @@ program FindEigenvalue
   do state = 1, 3
      write(*,'(A,I1,A,F13.7,A,F18.12,A)')"state ",state," exact = ",exact_solution(state)," = ",exact_solution(state)*fermi*1000," keV"
   end do
-  !
+
   eigenvalue(:)   = (1.0_dp-proportional_factor)*exact_solution(:) !+ m_reduced  ! initial guess = 2.7 keV
   F_state(:,:)    = 0.0_dp
   G_state(:,:)    = 0.0_dp
-  !
 
   if ( solving_method == 1 ) print *,"USING RUNGE KUTTA TO FIND EIGENVALUE"
   if ( solving_method == 2 ) print *,"USING ADAMS BASHFORTH TO FIND EIGENVALUE"
-  !
+
   do state = 1, 1!num_states
-     !
-     !
+ 
      do attempt = 1, max_attempts
-        ! eigenvalue = 
+
         write(*,'(a,F18.12,a)')"eigenvalue = ",eigenvalue(state)*fermi*1000," keV"
         write(*,'(a,F18.12,a)')"exact soln = ",exact_solution(state)*fermi*1000," keV"
         ! calculate F and G
@@ -250,7 +242,7 @@ program FindEigenvalue
 !!$              !
 !!$           end if
         !
-        if ( attempt == max_attempts ) STOP ' too many try '
+        if ( attempt == max_attempts ) STOP ' too many attempts '
         !
      end do
      !
@@ -444,8 +436,8 @@ program FindEigenvalue
      write(*,*)"THE EVALUE OF STATE ",state," IS ",eigenvalue(state)*fermi*1000," keV"
      write(*,*)"THE EXACT SOL OF STATE  ",state," IS ",exact_solution(state)*fermi*1000," keV"
      !
-     write(*,*)"THE EVALUE OF STATE ",state," IS ",eigenvalue(state)," fm^(-1)"
-     write(*,*)"THE EXACT SOL OF STATE  ",state," IS ",exact_solution(state)," fm^(-1)"
+     ! write(*,*)"THE EVALUE OF STATE ",state," IS ",eigenvalue(state)," fm^(-1)"
+     ! write(*,*)"THE EXACT SOL OF STATE  ",state," IS ",exact_solution(state)," fm^(-1)"
      !
 !!$        open(61,file='muH_F.dat',status='unknown')
 !!$        do r_it = 1, n_steps,1000

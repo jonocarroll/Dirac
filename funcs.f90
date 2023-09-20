@@ -14,10 +14,12 @@ contains
     real(dp), intent(in) :: rad
     real(dp) :: Coulomb
 
+    !! finite charge distribution - requires integration
 !!$    Coulomb = -alpha*((4.0_dp*pi_d/rad)*integral(c_func1,0.0_dp,rad,abs_err,rel_err) &
 !!$         & + (4.0_dp*pi_d)*integral(c_func2,rad,huge(1.0_dp),abs_err,rel_err))
 !!$
 
+    !! point charge distribution
     Coulomb = -alpha/rad
 
   end function Coulomb

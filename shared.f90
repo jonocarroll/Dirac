@@ -12,7 +12,7 @@ module shared
   real(dp), parameter :: m_muon = m_electron
 
   real(dp), parameter :: m_reduced = (m_muon*m_proton)/(m_muon+m_proton)
-!!$  real(dp), parameter :: m_reduced = m_muon
+  !!$  real(dp), parameter :: m_reduced = m_muon
   real(dp), parameter :: test_radius = 0.84184_dp
   real(dp), parameter :: physical_radius = 0.84184_dp
 
@@ -21,15 +21,15 @@ module shared
   real(dp), parameter :: gamma = 0.999973373968498_dp           ! gamma = SQRT[1-alpha**2]
   real(dp), parameter :: euler_gamma_func = 1.99990172319612_dp ! GAMMA[1+2gamma] calculated fully
 
-!!$  integer(I4B), parameter :: n_steps = 4000*1e3_I4B ! number of steps (2000 fm)
-!!$  integer(I4B), parameter :: match   = 500*1e3_I4B  ! match point number (680 fm) or 282
-  integer(I8B), parameter :: n_steps = 4000e4_I8B ! number of steps (2000 fm)
-!!$  integer(I8B), parameter :: match   = 500e4_I8B  ! match point number == 1s(1/2)
-  integer(I8B), parameter :: match   = 282e4_I8B  ! match point number == 2s(1/2)
+  integer(I8B), parameter :: n_steps = 500*1e5_I8B ! number of steps (5000 fm)
+  integer(I8B), parameter :: match   = 100*1e3_I8B  ! match point number (680 fm) or 282
+  !integer(I8B), parameter :: n_steps = 4000e4_I8B ! number of steps (2000 fm)
+  ! integer(I8B), parameter :: match   = 500e4_I8B  ! match point number == 1s(1/2)
+  !!$integer(I8B), parameter :: match   = 282e4_I8B  ! match point number == 2s(1/2)
 
   integer, parameter :: max_attempts = 1e4  ! max number of attempts to solve
 
-  real(dp), parameter :: h_step  = 1.0e-4_dp  ! step size = 1/10000 fm
+  real(dp), parameter :: h_step  = 1.0e-2_dp  ! step size = 1/100 fm
  !! real(dp), parameter :: yErrReq = 1.0e-12_dp      ! required precision (!) !!JDC2023
   real(dp), parameter :: yErrReq = 1.0e-6_dp      ! required precision (!) 
 
